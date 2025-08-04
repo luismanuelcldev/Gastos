@@ -87,4 +87,12 @@ class GastosCubit extends Cubit<GastosState> {
       // No hay presupuesto para esta categoría
     }
   }
+
+  void eliminarCategoria(String nombre) {}
+
+  void configurarPresupuesto(Presupuesto presupuesto) {}
+
+  void eliminarPresupuesto(String categoria) {}
+
+  void eliminarGasto(String id) {}
 }
