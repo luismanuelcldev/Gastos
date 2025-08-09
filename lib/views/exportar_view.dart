@@ -79,11 +79,11 @@ class VistaExportar extends StatelessWidget {
                             ),
                             const SizedBox(height: 32),
 
-                            // Estadísticas rápidas
+                            // Estadísticas rapidas
                             _buildEstadisticas(state),
                             const SizedBox(height: 32),
 
-                            // Opciones de exportación
+                            // Opciones de exportaciosn
                             const Text(
                               'Selecciona el formato de exportación:',
                               style: TextStyle(
@@ -94,7 +94,7 @@ class VistaExportar extends StatelessWidget {
                             ),
                             const SizedBox(height: 20),
 
-                            // Botón PDF
+                            // Boton PDF
                             _BotonExportar(
                               icono: Icons.picture_as_pdf,
                               titulo: 'Exportar a PDF',
@@ -293,7 +293,7 @@ class VistaExportar extends StatelessWidget {
     }
 
     try {
-      final archivo = await ServicioPDF.generarPDF(gastos);
+      final _ = await ServicioPDF.generarPDF(gastos);
       if (context.mounted) {
         _mostrarMensaje(
           context,
@@ -321,7 +321,7 @@ class VistaExportar extends StatelessWidget {
     }
 
     try {
-      final archivo = await ServicioCSV.generarCSV(gastos);
+      final _ = await ServicioCSV.generarCSV(gastos);
       if (context.mounted) {
         _mostrarMensaje(
           context,

@@ -387,7 +387,6 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
 
       context.read<GastosCubit>().agregarGasto(gasto);
 
-      // Mostrar mensaje de éxito
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Row(

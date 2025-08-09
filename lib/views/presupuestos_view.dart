@@ -107,7 +107,7 @@ class VistaPresupuestos extends StatelessWidget {
     final limiteController = TextEditingController();
     String categoriaSeleccionada = '';
 
-    // Obtener categorías disponibles
+    // Obtener categorias disponibles
     final categorias = context.read<GastosCubit>().state.categorias;
     if (categorias.isNotEmpty) {
       categoriaSeleccionada = categorias.first.nombre;
@@ -166,7 +166,7 @@ class VistaPresupuestos extends StatelessWidget {
                           key: formKey,
                           child: Column(
                             children: [
-                              // Dropdown de categorías
+                              // Dropdown de categorias
                               Container(
                                 decoration: BoxDecoration(
                                   boxShadow: [
@@ -257,11 +257,11 @@ class VistaPresupuestos extends StatelessWidget {
                                   ),
                                   validator: (value) {
                                     if (value?.isEmpty ?? true)
-                                      return 'Ingrese un límite';
+                                      return 'Ingrese un limite';
                                     if (double.tryParse(value!) == null)
-                                      return 'Ingrese un número válido';
+                                      return 'Ingrese un numero válido';
                                     if (double.parse(value) <= 0)
-                                      return 'El límite debe ser mayor a 0';
+                                      return 'El limite debe ser mayor a 0';
                                     return null;
                                   },
                                 ),

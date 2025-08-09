@@ -83,9 +83,7 @@ class GastosCubit extends Cubit<GastosState> {
           ),
         );
       }
-    } catch (_) {
-      // No hay presupuesto para esta categoría
-    }
+    } catch (_) {}
   }
 
   void eliminarCategoria(String nombre) {}
