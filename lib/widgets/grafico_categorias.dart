@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
+// Widget que muestra un gráfico de barras con el resumen de gastos por categoría
 class GraficoCategorias extends StatelessWidget {
   final Map<String, double> resumen;
 
@@ -90,6 +91,7 @@ class GraficoCategorias extends StatelessWidget {
     );
   }
 
+  // Crea los grupos de barras para el gráfico
   List<BarChartGroupData> _createBarGroups() {
     return resumen.entries.map((entry) {
       final index = resumen.keys.toList().indexOf(entry.key);
@@ -110,11 +112,13 @@ class GraficoCategorias extends StatelessWidget {
     }).toList();
   }
 
+  // Obtiene el valor máximo para escalar el gráfico
   double _getMaxValue() {
     if (resumen.isEmpty) return 0;
     return resumen.values.reduce((a, b) => a > b ? a : b);
   }
 
+  // Asigna un color a cada barra basado en su índice
   Color _getColorForIndex(int index) {
     final colors = [
       Colors.blue,
