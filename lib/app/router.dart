@@ -20,7 +20,7 @@ final router = GoRouter(
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       builder: (context, state, child) {
-        return ScaffoldWithNavBar(child: child);
+        return EstructuraConBarraNavegacion(hijo: child);
       },
       routes: [
         // Ruta principal: Resumen

@@ -17,7 +17,7 @@ Desarrollar una aplicación móvil utilizando Flutter para el control y gestión
 
 - **Análisis Visual:** Gráficos de barras interactivos para visualizar gastos por categoría con tooltips informativos.
 
-- **Exportación de Reportes:** Generación de reportes en formato PDF y CSV para análisis externo.
+- **Exportación de Reportes:** Generación de reportes en formato PDF y Excel para análisis externo.
 
 - **Alertas Inteligentes:** Notificaciones automáticas al acercarse o exceder límites de presupuesto.
 
@@ -61,12 +61,14 @@ Desarrollar una aplicación móvil utilizando Flutter para el control y gestión
 ### Stack Tecnológico
 - **Framework:** Flutter (Dart SDK >=3.0.0 <4.0.0)
 - **Lenguaje:** Dart
-- **Arquitectura:** BLoC Pattern (flutter_bloc ^8.1.6)
-- **Navegación:** GoRouter ^14.6.2
-- **Persistencia:** SharedPreferences ^2.3.2
-- **Gráficos:** FL Chart ^0.69.0
-- **Internacionalización:** intl ^0.19.0
-- **Exportación PDF:** pdf ^3.11.1
+- **Arquitectura:** BLoC Pattern (flutter_bloc ^9.1.1)
+- **Navegación:** GoRouter ^16.0.0
+- **Persistencia:** SharedPreferences ^2.5.3
+- **Gráficos:** FL Chart ^1.0.0
+- **Internacionalización:** intl ^0.17.0
+- **Exportación PDF:** pdf ^3.11.3
+- **Exportación Excel:** excel ^4.0.6
+- **Compartir Archivos:** share_plus ^12.0.1
 - **Archivos:** path_provider ^2.1.4
 
 ### Estructura del Proyecto
@@ -74,33 +76,44 @@ Desarrollar una aplicación móvil utilizando Flutter para el control y gestión
 lib/
 ├── app/                 # Configuración de la aplicación
 │   ├── app.dart        # Widget principal de la app
-│   └── router.dart     # Configuración de rutas
+│   └── router.dart     # Configuración de rutas y navegación
 ├── cubit/              # Gestión de estado (BLoC)
-│   ├── gastos_cubit.dart
-│   └── gastos_state.dart
+│   ├── gastos_cubit.dart   # Lógica de negocio y manejo de eventos
+│   └── gastos_state.dart   # Definición de estados de la aplicación
 ├── models/             # Modelos de datos
-│   ├── gasto.dart
-│   ├── categoria.dart
-│   └── presupuesto.dart
+│   ├── gasto.dart          # Modelo de datos para transacciones
+│   ├── categoria.dart      # Modelo para clasificación de gastos
+│   └── presupuesto.dart    # Modelo para límites de gastos
 ├── repositories/       # Capa de datos
-│   ├── gastos_repository.dart
-│   ├── categorias_repository.dart
-│   └── presupuesto_repository.dart
+│   ├── gastos_repository.dart      # Persistencia de gastos
+│   ├── categorias_repository.dart  # Persistencia de categorías
+│   └── presupuesto_repository.dart # Persistencia de presupuestos
 ├── services/           # Servicios de exportación
-│   ├── csv_service.dart
-│   └── pdf_service.dart
+│   ├── excel_service.dart  # Generación de archivos Excel
+│   └── pdf_service.dart    # Generación de reportes PDF
 ├── views/              # Interfaces de usuario
-│   ├── resumen_view.dart
-│   ├── agregar_gasto_view.dart
-│   ├── categorias_view.dart
-│   ├── presupuestos_view.dart
-│   └── exportar_view.dart
+│   ├── resumen_view.dart       # Pantalla principal con resumen
+│   ├── agregar_gasto_view.dart # Formulario para nuevos gastos
+│   ├── categorias_view.dart    # Gestión de categorías
+│   ├── presupuestos_view.dart  # Configuración de presupuestos
+│   └── exportar_view.dart      # Pantalla de descarga de reportes
 ├── widgets/            # Componentes reutilizables
-│   ├── grafico_categorias.dart
-│   ├── lista_gastos.dart
-│   └── input_gasto.dart
-└── main.dart           # Punto de entrada de la aplicacion
+│   ├── grafico_categorias.dart     # Widget de gráfico estadístico
+│   ├── lista_gastos.dart           # Listado visual de transacciones
+│   ├── input_gasto.dart            # Campo de entrada personalizado
+│   └── scaffold_with_nav_bar.dart  # Estructura base con navegación
+└── main.dart           # Punto de entrada de la aplicación
 ```
+
+### Justificación de Arquitectura: ¿Por qué BLoC?
+
+Para este proyecto personal, la elección de **BLoC (Business Logic Component)** como gestor de estado responde a la necesidad de construir una aplicación robusta, escalable y profesional.
+
+- **Separación de Responsabilidades:** Desacopla la lógica de negocio de la interfaz gráfica. La UI solo "reacciona" a los estados, mientras que el `Cubit` procesa la lógica, lo que resulta en un código más limpio y legible.
+- **Flujo de Datos Unidireccional:** Facilita el rastreo de errores y el entendimiento de cómo viaja la información dentro de la app, desde la interacción del usuario hasta la actualización de la pantalla.
+- **Testabilidad:** Al ser componentes de lógica pura separados de los Widgets, los BLoCs/Cubits son fácilmente testeables, asegurando que la lógica de presupuestos y gastos funcione correctamente.
+- **Persistencia y Reactividad:** Se integra perfectamente con repositorios y servicios (como `SharedPreferences`), permitiendo que la UI se actualice automáticamente cuando los datos cambian.
+- **Estándar Profesional:** El uso de BLoC demuestra el dominio de una de las arquitecturas más demandadas y potentes en el ecosistema Flutter actual.
 
 ## Inicialización del Proyecto Flutter
 
@@ -183,7 +196,7 @@ Esto iniciará la aplicación en el emulador, dispositivo conectado o navegador 
 
 ### Exportación de Datos
 - **Reportes PDF:** Generación de reportes profesionales con tablas y totales
-- **Exportación CSV:** Archivos CSV compatibles con Excel y hojas de cálculo
+- **Exportación Excel:** Archivos .xlsx compatibles con Excel y hojas de cálculo
 - **Gestión de Archivos:** Almacenamiento temporal con path_provider
 - **Manejo de Errores:** Validación y mensajes informativos al usuario
 
@@ -253,7 +266,7 @@ class Presupuesto {
 
 ### Exportación
 - ✅ Reportes PDF con tabla profesional
-- ✅ Archivos CSV para análisis externo
+- ✅ Archivos Excel para análisis externo
 - ✅ Cálculo automático de totales
 - ✅ Gestión de archivos temporales
 
