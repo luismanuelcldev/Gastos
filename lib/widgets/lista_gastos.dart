@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../cubit/gastos_cubit.dart';
 import '../models/gasto.dart';
 
+// Widget que muestra la lista de gastos agrupados por fecha
 class ListaGastos extends StatelessWidget {
   final List<Gasto> gastos;
 
@@ -134,6 +135,7 @@ class ListaGastos extends StatelessWidget {
   }
 }
 
+// Widget que representa un item individual de gasto en la lista
 class _GastoItem extends StatelessWidget {
   final Gasto gasto;
 
@@ -275,6 +277,7 @@ class _GastoItem extends StatelessWidget {
     );
   }
 
+  // Obtiene el ícono correspondiente a la categoría
   IconData _getIconData(String categoria) {
     switch (categoria.toLowerCase()) {
       case 'comida':
@@ -298,6 +301,7 @@ class _GastoItem extends StatelessWidget {
     }
   }
 
+  // Muestra los detalles del gasto en un BottomSheet
   void _mostrarDetalles(BuildContext context) {
     showModalBottomSheet(
       context: context,
@@ -367,6 +371,7 @@ class _GastoItem extends StatelessWidget {
     );
   }
 
+  // Muestra un diálogo de confirmación para eliminar el gasto
   void _confirmarEliminacion(BuildContext context) {
     showDialog(
       context: context,
@@ -431,6 +436,7 @@ class _GastoItem extends StatelessWidget {
   }
 }
 
+// Widget para mostrar un item de detalle en el BottomSheet
 class _DetalleItem extends StatelessWidget {
   final String titulo;
   final String valor;
