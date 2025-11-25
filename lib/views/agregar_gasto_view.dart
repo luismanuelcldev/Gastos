@@ -5,6 +5,7 @@ import '../cubit/gastos_cubit.dart';
 import '../models/gasto.dart';
 import '../widgets/input_gasto.dart';
 
+// Vista para agregar un nuevo gasto
 class AgregarGastoView extends StatefulWidget {
   const AgregarGastoView({super.key});
 
@@ -28,6 +29,7 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
 
   @override
   Widget build(BuildContext context) {
+    // Obtengo las categorías disponibles desde el estado
     final categorias = context.watch<GastosCubit>().state.categorias;
 
     return Scaffold(
@@ -45,7 +47,7 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
             children: [
               // Header
               _buildHeader(context),
-              // Form
+              // Formulario de ingreso de datos
               Expanded(
                 child: Container(
                   margin: const EdgeInsets.only(top: 20),
@@ -253,6 +255,7 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
     );
   }
 
+  // Construyo el encabezado de la vista
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -291,6 +294,7 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
     );
   }
 
+  // Envuelvo los campos con un estilo común
   Widget _buildStyledField({required Widget child}) {
     return Container(
       decoration: BoxDecoration(
@@ -306,6 +310,7 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
     );
   }
 
+  // Valido que el monto sea un número positivo
   String? _validarMonto(String? value) {
     if (value == null || value.isEmpty) return 'Ingrese un monto';
     if (double.tryParse(value) == null) return 'Monto inválido';
@@ -313,12 +318,14 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
     return null;
   }
 
+  // Valido que la descripción tenga al menos 3 caracteres
   String? _validarDescripcion(String? value) {
     if (value == null || value.isEmpty) return 'Ingrese una descripción';
     if (value.length < 3) return 'Mínimo 3 caracteres';
     return null;
   }
 
+  // Obtengo el icono correspondiente al nombre de la categoría
   IconData _getIconData(String iconName) {
     switch (iconName.toLowerCase()) {
       case 'food':
@@ -350,6 +357,7 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
     }
   }
 
+  // Muestro el selector de fecha
   Future<void> _seleccionarFecha() async {
     final fecha = await showDatePicker(
       context: context,
@@ -375,6 +383,7 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
     }
   }
 
+  // Guardo el gasto en el estado global
   void _guardarGasto() {
     if (_formKey.currentState!.validate()) {
       final gasto = Gasto(
