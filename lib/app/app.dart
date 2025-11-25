@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'router.dart';
 
+// Widget raíz de la aplicación que configura el MaterialApp y el tema
 class AppGastos extends StatelessWidget {
   const AppGastos({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Configuro el router y el tema visual de la aplicación
     return MaterialApp.router(
       title: 'Control de Gastos',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // Esquema de colores rojo y blanco
+        // Defino el esquema de colores basado en rojo y blanco
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color(0xFFD32F2F), // Rojo principal
           primary: const Color(0xFFD32F2F),
@@ -21,7 +23,7 @@ class AppGastos extends StatelessWidget {
         ),
         useMaterial3: true,
 
-        // AppBar personalizado
+        // Personalizo el tema de la barra de aplicación
         appBarTheme: const AppBarTheme(
           backgroundColor: Color(0xFFD32F2F),
           foregroundColor: Colors.white,
@@ -34,8 +36,8 @@ class AppGastos extends StatelessWidget {
           ),
         ),
 
-        // Cards personalizadas
-        cardTheme: CardTheme(
+        // Personalizo el estilo de las tarjetas
+        cardTheme: CardThemeData(
           elevation: 8,
           shadowColor: Colors.grey.withOpacity(0.3),
           shape: RoundedRectangleBorder(
@@ -44,14 +46,14 @@ class AppGastos extends StatelessWidget {
           color: Colors.white,
         ),
 
-        // Floating Action Button
+        // Personalizo el botón flotante
         floatingActionButtonTheme: const FloatingActionButtonThemeData(
           backgroundColor: Color(0xFFD32F2F),
           foregroundColor: Colors.white,
           elevation: 8,
         ),
 
-        // Elevated Button
+        // Personalizo los botones elevados
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFD32F2F),
@@ -63,7 +65,7 @@ class AppGastos extends StatelessWidget {
           ),
         ),
 
-        // Input Decoration
+        // Personalizo los campos de entrada de texto
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: Colors.grey[50],
