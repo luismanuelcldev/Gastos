@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/gastos_cubit.dart';
 import '../models/categoria.dart';
 
+// Vista principal para la gestión de categorías
 class VistaCategorias extends StatelessWidget {
   const VistaCategorias({super.key});
 
@@ -64,23 +65,13 @@ class VistaCategorias extends StatelessWidget {
     );
   }
 
+  // Construyo el encabezado de la vista
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
-      child: Row(
+      child: const Row(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-            ),
-          ),
-          const SizedBox(width: 16),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -102,10 +93,10 @@ class VistaCategorias extends StatelessWidget {
     );
   }
 
+  // Muestro el diálogo para agregar una nueva categoría
   static void _mostrarDialogoAgregar(BuildContext context) {
     final formKey = GlobalKey<FormState>();
     final nombreController = TextEditingController();
-    final iconoController = TextEditingController();
 
     showDialog(
       context: context,
@@ -197,48 +188,6 @@ class VistaCategorias extends StatelessWidget {
                                         : null,
                           ),
                         ),
-                        const SizedBox(height: 16),
-                        // Campo ícono
-                        Container(
-                          decoration: BoxDecoration(
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                blurRadius: 10,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: TextFormField(
-                            controller: iconoController,
-                            decoration: InputDecoration(
-                              labelText:
-                                  'Ícono (ej: comida, transporte, hogar)',
-                              hintText: 'comida',
-                              prefixIcon: const Icon(Icons.emoji_symbols),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD32F2F),
-                                  width: 2,
-                                ),
-                              ),
-                            ),
-                            validator:
-                                (value) =>
-                                    value?.isEmpty ?? true
-                                        ? 'Ingrese un ícono'
-                                        : null,
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -286,7 +235,7 @@ class VistaCategorias extends StatelessWidget {
                                 context.read<GastosCubit>().agregarCategoria(
                                   Categoria(
                                     nombre: nombreController.text,
-                                    icono: iconoController.text,
+                                    icono: 'category',
                                     color: const Color(0xFFD32F2F),
                                   ),
                                 );
@@ -339,6 +288,7 @@ class VistaCategorias extends StatelessWidget {
     );
   }
 
+  // Método estático para obtener el icono (usado por otras clases)
   static IconData _getIconDataStatic(String iconName) {
     switch (iconName.toLowerCase()) {
       case 'food':
@@ -371,6 +321,7 @@ class VistaCategorias extends StatelessWidget {
   }
 }
 
+// Widget interno para listar las categorías
 class _ListaCategorias extends StatelessWidget {
   const _ListaCategorias();
 
@@ -453,19 +404,45 @@ class _ListaCategorias extends StatelessWidget {
                             fontSize: 14,
                           ),
                         ),
-                        trailing: Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFD32F2F).withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.delete,
-                              color: Color(0xFFD32F2F),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD32F2F).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Color(0xFFD32F2F),
+                                ),
+                                onPressed:
+                                    () => _mostrarDialogoEditar(
+                                      context,
+                                      categoria,
+                                    ),
+                              ),
                             ),
-                            onPressed:
-                                () => _confirmarEliminacion(context, categoria),
-                          ),
+                            const SizedBox(width: 8),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD32F2F).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(
+                                  Icons.delete,
+                                  color: Color(0xFFD32F2F),
+                                ),
+                                onPressed:
+                                    () => _confirmarEliminacion(
+                                      context,
+                                      categoria,
+                                    ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -479,10 +456,148 @@ class _ListaCategorias extends StatelessWidget {
     );
   }
 
+  // Muestro el diálogo para editar una categoría existente
+  void _mostrarDialogoEditar(BuildContext context, Categoria categoria) {
+    final formKey = GlobalKey<FormState>();
+    final nombreController = TextEditingController(text: categoria.nombre);
+
+    showDialog(
+      context: context,
+      builder:
+          (context) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Colors.white, Color(0xFFFFF5F5)],
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFD32F2F).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.edit, color: Color(0xFFD32F2F), size: 28),
+                        SizedBox(width: 12),
+                        Text(
+                          'Editar Categoría',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFD32F2F),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Form(
+                    key: formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: nombreController,
+                          decoration: InputDecoration(
+                            labelText: 'Nombre de la categoría',
+                            prefixIcon: const Icon(Icons.label),
+                            filled: true,
+                            fillColor: Colors.grey[50],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: Color(0xFFD32F2F),
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                          validator:
+                              (value) =>
+                                  value?.isEmpty ?? true
+                                      ? 'Ingrese un nombre'
+                                      : null,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.grey,
+                          ),
+                          child: const Text('Cancelar'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              context.read<GastosCubit>().actualizarCategoria(
+                                categoria.nombre,
+                                Categoria(
+                                  nombre: nombreController.text,
+                                  icono: categoria.icono,
+                                  color: categoria.color,
+                                ),
+                              );
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text('Categoría actualizada'),
+                                  backgroundColor: const Color(0xFFD32F2F),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD32F2F),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text('Actualizar'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+    );
+  }
+
+  // Obtengo el icono correspondiente
   IconData _getIconData(String iconName) {
     return VistaCategorias._getIconDataStatic(iconName);
   }
 
+  // Muestro el diálogo de confirmación para eliminar
   void _confirmarEliminacion(BuildContext context, Categoria categoria) {
     showDialog(
       context: context,
