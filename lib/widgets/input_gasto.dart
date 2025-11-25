@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+// Widget reutilizable para campos de entrada de texto en formularios de gastos
 class InputGasto extends StatelessWidget {
   final TextEditingController controller;
   final String label;
