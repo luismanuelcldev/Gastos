@@ -1,5 +1,6 @@
 part of 'gastos_cubit.dart';
 
+// Clase inmutable que representa el estado de la aplicación en un momento dado
 class GastosState {
   final List<Gasto> gastos;
   final List<Categoria> categorias;
@@ -13,9 +14,11 @@ class GastosState {
     this.alerta,
   });
 
+  // Factory para crear el estado inicial vacío
   factory GastosState.init() =>
       GastosState(gastos: [], categorias: [], presupuestos: []);
 
+  // Método para crear una copia del estado con algunos campos modificados
   GastosState copyWith({
     List<Gasto>? gastos,
     List<Categoria>? categorias,
@@ -30,6 +33,7 @@ class GastosState {
     );
   }
 
+  // Getter calculado que agrupa los gastos por categoría para reportes
   Map<String, double> get resumenPorCategoria {
     final resumen = <String, double>{};
 
