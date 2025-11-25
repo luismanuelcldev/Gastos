@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:path_provider/path_provider.dart';
 import '../cubit/gastos_cubit.dart';
 import '../models/gasto.dart';
 import '../services/pdf_service.dart';
-import '../services/csv_service.dart';
+import '../services/excel_service.dart';
 
+// Vista para exportar los datos de gastos a diferentes formatos
 class VistaExportar extends StatelessWidget {
   const VistaExportar({super.key});
 
@@ -106,15 +112,15 @@ class VistaExportar extends StatelessWidget {
                             ),
                             const SizedBox(height: 16),
 
-                            // Botón CSV
+                            // Botón Excel
                             _BotonExportar(
                               icono: Icons.table_chart,
-                              titulo: 'Exportar a CSV',
+                              titulo: 'Exportar a Excel',
                               descripcion:
-                                  'Datos en formato de hoja de cálculo',
+                                  'Datos en formato de hoja de cálculo (.xlsx)',
                               color: const Color(0xFF2E7D32),
                               onPressed:
-                                  () => _exportarCSV(context, state.gastos),
+                                  () => _exportarExcel(context, state.gastos),
                             ),
                             const SizedBox(height: 32),
 
@@ -154,8 +160,8 @@ class VistaExportar extends StatelessWidget {
                                   const SizedBox(height: 8),
                                   Text(
                                     '• PDF: Incluye gráficos, tablas y resumen por categorías\n'
-                                    '• CSV: Compatible con Excel, Sheets y otras aplicaciones\n'
-                                    '• Los archivos se guardan en la carpeta de descargas',
+                                    '• Excel: Formato .xlsx compatible con Office y Sheets\n'
+                                    '• Puedes compartir el archivo o guardarlo en tu dispositivo',
                                     style: TextStyle(
                                       color: Colors.grey[700],
                                       height: 1.5,
@@ -178,6 +184,7 @@ class VistaExportar extends StatelessWidget {
     );
   }
 
+  // Construyo el encabezado de la vista
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -216,6 +223,7 @@ class VistaExportar extends StatelessWidget {
     );
   }
 
+  // Muestro un resumen rápido de las estadísticas antes de exportar
   Widget _buildEstadisticas(GastosState state) {
     final totalGastos = state.gastos.fold(
       0.0,
@@ -286,6 +294,7 @@ class VistaExportar extends StatelessWidget {
     );
   }
 
+  // Lógica para generar y compartir el PDF
   Future<void> _exportarPDF(BuildContext context, List<Gasto> gastos) async {
     if (gastos.isEmpty) {
       _mostrarMensaje(context, 'No hay gastos para exportar');
@@ -293,19 +302,25 @@ class VistaExportar extends StatelessWidget {
     }
 
     try {
-      final _ = await ServicioPDF.generarPDF(gastos);
-      if (context.mounted) {
-        _mostrarMensaje(
-          context,
-          'PDF generado exitosamente',
-          accion: SnackBarAction(
-            label: 'Abrir',
-            textColor: Colors.white,
-            onPressed: () {
-              // Aquí podrías implementar la apertura del archivo
-            },
-          ),
+      final bytes = await ServicioPDF.generarPDF(gastos);
+      XFile file;
+
+      if (kIsWeb) {
+        file = XFile.fromData(
+          bytes,
+          mimeType: 'application/pdf',
+          name: 'reporte_gastos.pdf',
         );
+      } else {
+        final output = await getTemporaryDirectory();
+        final filePath = '${output.path}/reporte_gastos.pdf';
+        final fileIo = File(filePath);
+        await fileIo.writeAsBytes(bytes);
+        file = XFile(filePath);
+      }
+
+      if (context.mounted) {
+        await Share.shareXFiles([file], text: 'Reporte de Gastos (PDF)');
       }
     } catch (e) {
       if (context.mounted) {
@@ -314,34 +329,46 @@ class VistaExportar extends StatelessWidget {
     }
   }
 
-  Future<void> _exportarCSV(BuildContext context, List<Gasto> gastos) async {
+  // Lógica para generar y compartir el Excel
+  Future<void> _exportarExcel(BuildContext context, List<Gasto> gastos) async {
     if (gastos.isEmpty) {
       _mostrarMensaje(context, 'No hay gastos para exportar');
       return;
     }
 
     try {
-      final _ = await ServicioCSV.generarCSV(gastos);
-      if (context.mounted) {
-        _mostrarMensaje(
-          context,
-          'CSV generado exitosamente',
-          accion: SnackBarAction(
-            label: 'Abrir',
-            textColor: Colors.white,
-            onPressed: () {
-              // Aquí podrías implementar la apertura del archivo
-            },
-          ),
+      final bytes = await ServicioExcel.generarExcel(gastos);
+      if (bytes == null) {
+        throw Exception('Error al generar el archivo Excel');
+      }
+
+      XFile file;
+      if (kIsWeb) {
+        file = XFile.fromData(
+          Uint8List.fromList(bytes),
+          mimeType:
+              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          name: 'reporte_gastos.xlsx',
         );
+      } else {
+        final output = await getTemporaryDirectory();
+        final filePath = '${output.path}/reporte_gastos.xlsx';
+        final fileIo = File(filePath);
+        await fileIo.writeAsBytes(bytes);
+        file = XFile(filePath);
+      }
+
+      if (context.mounted) {
+        await Share.shareXFiles([file], text: 'Reporte de Gastos (Excel)');
       }
     } catch (e) {
       if (context.mounted) {
-        _mostrarMensaje(context, 'Error al generar CSV: $e');
+        _mostrarMensaje(context, 'Error al generar Excel: $e');
       }
     }
   }
 
+  // Helper para mostrar mensajes al usuario
   void _mostrarMensaje(
     BuildContext context,
     String mensaje, {
@@ -365,6 +392,7 @@ class VistaExportar extends StatelessWidget {
   }
 }
 
+// Widget reutilizable para los botones de exportación
 class _BotonExportar extends StatelessWidget {
   final IconData icono;
   final String titulo;
@@ -447,6 +475,7 @@ class _BotonExportar extends StatelessWidget {
   }
 }
 
+// Widget para mostrar un item de estadística
 class _EstadisticaItem extends StatelessWidget {
   final String titulo;
   final String valor;
