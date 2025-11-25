@@ -5,6 +5,7 @@ import '../cubit/gastos_cubit.dart';
 import '../widgets/grafico_categorias.dart';
 import '../widgets/lista_gastos.dart';
 
+// Vista principal que muestra el resumen de gastos y gráficos
 class ResumenView extends StatelessWidget {
   const ResumenView({super.key});
 
@@ -46,7 +47,7 @@ class ResumenView extends StatelessWidget {
           ],
         ),
         child: FloatingActionButton.extended(
-          onPressed: () => context.go('/agregar'),
+          onPressed: () => context.push('/agregar'),
           icon: const Icon(Icons.add, size: 24),
           label: const Text(
             'Nuevo Gasto',
@@ -54,10 +55,10 @@ class ResumenView extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: _BarraNavegacion(),
     );
   }
 
+  // Construye el encabezado de la vista
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -87,7 +88,7 @@ class ResumenView extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
-              onPressed: () => context.go('/exportar'),
+              onPressed: () => context.push('/exportar'),
               icon: const Icon(Icons.download, color: Colors.white, size: 28),
             ),
           ),
@@ -97,6 +98,7 @@ class ResumenView extends StatelessWidget {
   }
 }
 
+// Widget que contiene el gráfico y la lista de gastos
 class _ContenidoResumen extends StatelessWidget {
   const _ContenidoResumen();
 
@@ -134,7 +136,7 @@ class _ContenidoResumen extends StatelessWidget {
               Card(
                 elevation: 12,
                 child: Container(
-                  height: 300,
+                  height: 240,
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,49 +218,6 @@ class _ContenidoResumen extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class _BarraNavegacion extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: BottomNavigationBar(
-        currentIndex: 0,
-        selectedItemColor: const Color(0xFFD32F2F),
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: 'Resumen',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.category_rounded),
-            label: 'Categorías',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet_rounded),
-            label: 'Presupuestos',
-          ),
-        ],
-        onTap: (index) {
-          if (index == 1) context.go('/categorias');
-          if (index == 2) context.go('/presupuestos');
-        },
-      ),
     );
   }
 }
