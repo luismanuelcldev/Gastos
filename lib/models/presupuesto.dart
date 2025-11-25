@@ -1,3 +1,4 @@
+// Modelo que define un límite de gasto para una categoría
 class Presupuesto {
   final String categoria;
   final double limite;
@@ -9,12 +10,14 @@ class Presupuesto {
     required this.alerta,
   });
 
+  // Convierto el presupuesto a formato JSON para guardarlo
   Map<String, dynamic> toJson() => {
     'categoria': categoria,
     'limite': limite,
     'alerta': alerta,
   };
 
+  // Reconstruyo el presupuesto desde los datos guardados
   factory Presupuesto.fromJson(Map<String, dynamic> json) => Presupuesto(
     categoria: json['categoria'] as String,
     limite: (json['limite'] as num).toDouble(),
