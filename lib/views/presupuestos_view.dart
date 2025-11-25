@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../cubit/gastos_cubit.dart';
 import '../models/presupuesto.dart';
 
+// Vista para gestionar los presupuestos de gastos
 class VistaPresupuestos extends StatelessWidget {
   const VistaPresupuestos({super.key});
 
@@ -64,23 +65,13 @@ class VistaPresupuestos extends StatelessWidget {
     );
   }
 
+  // Construye el encabezado de la vista
   Widget _buildHeader(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
-      child: Row(
+      child: const Row(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-            ),
-          ),
-          const SizedBox(width: 16),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -102,14 +93,20 @@ class VistaPresupuestos extends StatelessWidget {
     );
   }
 
-  static void _mostrarDialogoAgregar(BuildContext context) {
+  // Muestra el diálogo para agregar o editar un presupuesto
+  static void _mostrarDialogoAgregar(
+    BuildContext context, {
+    Presupuesto? presupuestoEditar,
+  }) {
     final formKey = GlobalKey<FormState>();
-    final limiteController = TextEditingController();
-    String categoriaSeleccionada = '';
+    final limiteController = TextEditingController(
+      text: presupuestoEditar?.limite.toString() ?? '',
+    );
+    String categoriaSeleccionada = presupuestoEditar?.categoria ?? '';
 
     // Obtener categorias disponibles
     final categorias = context.read<GastosCubit>().state.categorias;
-    if (categorias.isNotEmpty) {
+    if (categoriaSeleccionada.isEmpty && categorias.isNotEmpty) {
       categoriaSeleccionada = categorias.first.nombre;
     }
 
@@ -142,17 +139,19 @@ class VistaPresupuestos extends StatelessWidget {
                             color: const Color(0xFFD32F2F).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(
+                              const Icon(
                                 Icons.account_balance_wallet,
                                 color: Color(0xFFD32F2F),
                                 size: 28,
                               ),
-                              SizedBox(width: 12),
+                              const SizedBox(width: 12),
                               Text(
-                                'Nuevo Presupuesto',
-                                style: TextStyle(
+                                presupuestoEditar != null
+                                    ? 'Editar Presupuesto'
+                                    : 'Nuevo Presupuesto',
+                                style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,
                                   color: Color(0xFFD32F2F),
@@ -182,11 +181,21 @@ class VistaPresupuestos extends StatelessWidget {
                                       categoriaSeleccionada.isNotEmpty
                                           ? categoriaSeleccionada
                                           : null,
+                                  onChanged:
+                                      presupuestoEditar != null
+                                          ? null
+                                          : (value) => setState(
+                                            () =>
+                                                categoriaSeleccionada = value!,
+                                          ),
                                   decoration: InputDecoration(
                                     labelText: 'Categoría',
                                     prefixIcon: const Icon(Icons.category),
                                     filled: true,
-                                    fillColor: Colors.grey[50],
+                                    fillColor:
+                                        presupuestoEditar != null
+                                            ? Colors.grey[200]
+                                            : Colors.grey[50],
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       borderSide: BorderSide(
@@ -210,10 +219,6 @@ class VistaPresupuestos extends StatelessWidget {
                                             ),
                                           )
                                           .toList(),
-                                  onChanged:
-                                      (value) => setState(
-                                        () => categoriaSeleccionada = value!,
-                                      ),
                                   validator:
                                       (value) =>
                                           value == null
@@ -336,15 +341,17 @@ class VistaPresupuestos extends StatelessWidget {
                                         context,
                                       ).showSnackBar(
                                         SnackBar(
-                                          content: const Row(
+                                          content: Row(
                                             children: [
-                                              Icon(
+                                              const Icon(
                                                 Icons.check_circle,
                                                 color: Colors.white,
                                               ),
-                                              SizedBox(width: 8),
+                                              const SizedBox(width: 8),
                                               Text(
-                                                '¡Presupuesto configurado exitosamente!',
+                                                presupuestoEditar != null
+                                                    ? '¡Presupuesto actualizado!'
+                                                    : '¡Presupuesto configurado!',
                                               ),
                                             ],
                                           ),
@@ -392,6 +399,7 @@ class VistaPresupuestos extends StatelessWidget {
   }
 }
 
+// Widget que muestra la lista de presupuestos configurados
 class _ListaPresupuestos extends StatelessWidget {
   const _ListaPresupuestos();
 
@@ -571,16 +579,34 @@ class _ListaPresupuestos extends StatelessWidget {
                                               8,
                                             ),
                                           ),
-                                          child: IconButton(
-                                            icon: const Icon(
-                                              Icons.delete,
-                                              color: Color(0xFFD32F2F),
-                                            ),
-                                            onPressed:
-                                                () => _confirmarEliminacion(
-                                                  context,
-                                                  presupuesto,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.edit,
+                                                  color: Color(0xFFD32F2F),
                                                 ),
+                                                onPressed:
+                                                    () =>
+                                                        VistaPresupuestos._mostrarDialogoAgregar(
+                                                          context,
+                                                          presupuestoEditar:
+                                                              presupuesto,
+                                                        ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.delete,
+                                                  color: Color(0xFFD32F2F),
+                                                ),
+                                                onPressed:
+                                                    () => _confirmarEliminacion(
+                                                      context,
+                                                      presupuesto,
+                                                    ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
@@ -687,6 +713,7 @@ class _ListaPresupuestos extends StatelessWidget {
     );
   }
 
+  // Muestra un diálogo de confirmación para eliminar un presupuesto
   void _confirmarEliminacion(BuildContext context, Presupuesto presupuesto) {
     showDialog(
       context: context,
