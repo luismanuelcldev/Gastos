@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import '../cubit/gastos_cubit.dart';
 import '../models/gasto.dart';
+import '../views/agregar_gasto_view.dart';
 
 // Widget que muestra la lista de gastos agrupados por fecha
 class ListaGastos extends StatelessWidget {
@@ -225,7 +226,11 @@ class _GastoItem extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            DateFormat('HH:mm').format(gasto.fecha),
+                            DateFormat('hh:mm a')
+                                .format(gasto.fecha)
+                                .toLowerCase()
+                                .replaceAll('pm', 'p.m')
+                                .replaceAll('am', 'a.m'),
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.grey[600],
@@ -249,23 +254,56 @@ class _GastoItem extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFD32F2F).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.delete,
-                          color: Color(0xFFD32F2F),
-                          size: 20,
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.edit,
+                              color: Colors.blue,
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) =>
+                                          AgregarGastoView(gastoAEditar: gasto),
+                                ),
+                              );
+                            },
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                          ),
                         ),
-                        onPressed: () => _confirmarEliminacion(context),
-                        constraints: const BoxConstraints(
-                          minWidth: 32,
-                          minHeight: 32,
+                        Container(
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFD32F2F).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.delete,
+                              color: Color(0xFFD32F2F),
+                              size: 20,
+                            ),
+                            onPressed: () => _confirmarEliminacion(context),
+                            constraints: const BoxConstraints(
+                              minWidth: 32,
+                              minHeight: 32,
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ],
                 ),
@@ -362,7 +400,11 @@ class _GastoItem extends StatelessWidget {
                 ),
                 _DetalleItem(
                   titulo: 'Fecha',
-                  valor: DateFormat('dd/MM/yyyy HH:mm').format(gasto.fecha),
+                  valor: DateFormat('dd/MM/yyyy hh:mm a')
+                      .format(gasto.fecha)
+                      .toLowerCase()
+                      .replaceAll('pm', 'p.m')
+                      .replaceAll('am', 'a.m'),
                 ),
                 const SizedBox(height: 24),
               ],
