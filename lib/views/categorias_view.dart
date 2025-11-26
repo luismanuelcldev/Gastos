@@ -397,13 +397,6 @@ class _ListaCategorias extends StatelessWidget {
                             fontSize: 16,
                           ),
                         ),
-                        subtitle: Text(
-                          'Ícono: ${categoria.icono}',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 14,
-                          ),
-                        ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
