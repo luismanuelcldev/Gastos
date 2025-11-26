@@ -29,6 +29,16 @@ class GastosRepository {
     await _guardarGastos(gastos);
   }
 
+  // Actualizo un gasto existente
+  Future<void> actualizarGasto(Gasto gastoActualizado) async {
+    final gastos = obtenerGastos();
+    final index = gastos.indexWhere((g) => g.id == gastoActualizado.id);
+    if (index != -1) {
+      gastos[index] = gastoActualizado;
+      await _guardarGastos(gastos);
+    }
+  }
+
   // Método privado para guardar la lista actualizada en SharedPreferences
   Future<void> _guardarGastos(List<Gasto> gastos) async {
     final gastosJson = gastos.map((g) => g.toRawJson()).toList();
