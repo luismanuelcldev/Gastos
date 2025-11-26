@@ -45,6 +45,7 @@ dependencies:
   excel: ^4.0.6
   share_plus: ^12.0.1
   open_filex: ^4.7.0
+  permission_handler: ^11.3.0
 
 dev_dependencies:
   flutter_test:
