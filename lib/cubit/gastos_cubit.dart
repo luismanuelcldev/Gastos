@@ -75,6 +75,14 @@ class GastosCubit extends Cubit<GastosState> {
     emit(state.copyWith(gastos: gastos));
   }
 
+  // Actualizo un gasto existente
+  Future<void> actualizarGasto(Gasto gasto) async {
+    await _gastosRepository.actualizarGasto(gasto);
+    final gastos = _gastosRepository.obtenerGastos();
+    emit(state.copyWith(gastos: gastos));
+    _verificarPresupuestos(gasto);
+  }
+
   // Limpio cualquier mensaje de alerta activo en el estado
   void limpiarAlerta() {
     emit(state.copyWith(alerta: null));
