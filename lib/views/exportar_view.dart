@@ -5,6 +5,8 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:open_filex/open_filex.dart';
 import '../cubit/gastos_cubit.dart';
 import '../models/gasto.dart';
 import '../services/pdf_service.dart';
@@ -303,24 +305,49 @@ class VistaExportar extends StatelessWidget {
 
     try {
       final bytes = await ServicioPDF.generarPDF(gastos);
-      XFile file;
 
       if (kIsWeb) {
-        file = XFile.fromData(
+        final file = XFile.fromData(
           bytes,
           mimeType: 'application/pdf',
           name: 'reporte_gastos.pdf',
         );
+        if (context.mounted) {
+          await Share.shareXFiles([file], text: 'Reporte de Gastos (PDF)');
+        }
       } else {
-        final output = await getTemporaryDirectory();
-        final filePath = '${output.path}/reporte_gastos.pdf';
-        final fileIo = File(filePath);
-        await fileIo.writeAsBytes(bytes);
-        file = XFile(filePath);
-      }
+        // Intentar guardar en Descargas primero
+        final path = await _guardarEnDescargas(
+          bytes,
+          'reporte_gastos_${DateTime.now().millisecondsSinceEpoch}.pdf',
+        );
 
-      if (context.mounted) {
-        await Share.shareXFiles([file], text: 'Reporte de Gastos (PDF)');
+        if (path != null) {
+          if (context.mounted) {
+            _mostrarMensaje(
+              context,
+              'Archivo guardado en la carpeta de Descargas',
+              accion: SnackBarAction(
+                label: 'Abrir',
+                textColor: Colors.white,
+                onPressed: () {
+                  OpenFilex.open(path);
+                },
+              ),
+            );
+          }
+        } else {
+          // Fallback a compartir si no se pudo guardar directamente
+          final output = await getTemporaryDirectory();
+          final filePath = '${output.path}/reporte_gastos.pdf';
+          final fileIo = File(filePath);
+          await fileIo.writeAsBytes(bytes);
+          final file = XFile(filePath);
+
+          if (context.mounted) {
+            await Share.shareXFiles([file], text: 'Reporte de Gastos (PDF)');
+          }
+        }
       }
     } catch (e) {
       if (context.mounted) {
@@ -342,29 +369,92 @@ class VistaExportar extends StatelessWidget {
         throw Exception('Error al generar el archivo Excel');
       }
 
-      XFile file;
       if (kIsWeb) {
-        file = XFile.fromData(
+        final file = XFile.fromData(
           Uint8List.fromList(bytes),
           mimeType:
               'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           name: 'reporte_gastos.xlsx',
         );
+        if (context.mounted) {
+          await Share.shareXFiles([file], text: 'Reporte de Gastos (Excel)');
+        }
       } else {
-        final output = await getTemporaryDirectory();
-        final filePath = '${output.path}/reporte_gastos.xlsx';
-        final fileIo = File(filePath);
-        await fileIo.writeAsBytes(bytes);
-        file = XFile(filePath);
-      }
+        // Intentar guardar en Descargas primero
+        final path = await _guardarEnDescargas(
+          Uint8List.fromList(bytes),
+          'reporte_gastos_${DateTime.now().millisecondsSinceEpoch}.xlsx',
+        );
 
-      if (context.mounted) {
-        await Share.shareXFiles([file], text: 'Reporte de Gastos (Excel)');
+        if (path != null) {
+          if (context.mounted) {
+            _mostrarMensaje(
+              context,
+              'Archivo guardado en la carpeta de Descargas',
+              accion: SnackBarAction(
+                label: 'Abrir',
+                textColor: Colors.white,
+                onPressed: () {
+                  OpenFilex.open(path);
+                },
+              ),
+            );
+          }
+        } else {
+          // Fallback a compartir
+          final output = await getTemporaryDirectory();
+          final filePath = '${output.path}/reporte_gastos.xlsx';
+          final fileIo = File(filePath);
+          await fileIo.writeAsBytes(bytes);
+          final file = XFile(filePath);
+
+          if (context.mounted) {
+            await Share.shareXFiles([file], text: 'Reporte de Gastos (Excel)');
+          }
+        }
       }
     } catch (e) {
       if (context.mounted) {
         _mostrarMensaje(context, 'Error al generar Excel: $e');
       }
+    }
+  }
+
+  // Intenta guardar el archivo en la carpeta pública de Descargas
+  Future<String?> _guardarEnDescargas(
+    Uint8List bytes,
+    String nombreArchivo,
+  ) async {
+    try {
+      Directory? directorio;
+
+      if (Platform.isAndroid) {
+        // Solicitar permisos de almacenamiento si es necesario
+        var status = await Permission.storage.status;
+        if (!status.isGranted) {
+          status = await Permission.storage.request();
+        }
+
+        // En Android 11+ (API 30+) WRITE_EXTERNAL_STORAGE no funciona igual,
+        // pero intentamos obtener el directorio de descargas público.
+        directorio = Directory('/storage/emulated/0/Download');
+        if (!await directorio.exists()) {
+          directorio = await getExternalStorageDirectory();
+        }
+      } else {
+        directorio = await getDownloadsDirectory();
+      }
+
+      if (directorio != null) {
+        final path = '${directorio.path}/$nombreArchivo';
+        final archivo = File(path);
+        await archivo.writeAsBytes(bytes);
+        return path;
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error guardando en descargas: $e');
+      return null;
     }
   }
 
