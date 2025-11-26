@@ -1,7 +1,7 @@
 # 💰 App Control de Gastos Flutter 
 
 ## Objetivo del Proyecto:
-Desarrollar una aplicación móvil utilizando Flutter para el control y gestión eficiente de gastos personales. La aplicación permite a los usuarios registrar, categorizar, analizar y exportar sus gastos con funcionalidades avanzadas como gráficos interactivos, sistema de presupuestos, alertas automáticas y exportación de reportes.
+Desarrollo de una aplicación móvil utilizando Flutter para el control y gestión eficiente de gastos personales. La aplicación permite a los usuarios registrar, categorizar, analizar y exportar sus gastos con funcionalidades como gráficos interactivos, sistema de presupuestos, alertas automáticas y exportación de reportes a PDF y Excel.
 
 > [!NOTE]
 > Aplicacion desarrollada con Flutter y arquitectura BLoC para gestión de estado reactivo
@@ -9,7 +9,7 @@ Desarrollar una aplicación móvil utilizando Flutter para el control y gestión
 
 ## Funcionalidades Principales:
 
-- **Gestión Completa de Gastos:** Crear, visualizar y eliminar gastos con información detallada (descripción, categoría, monto, fecha).
+- **Gestión Completa de Gastos:** Crear, visualizar, **editar** y eliminar gastos con información detallada (descripción, categoría, monto, fecha y hora exacta).
 
 - **Sistema de Categorías:** Gestión de categorías personalizadas con íconos intuitivos para clasificar gastos eficientemente.
 
@@ -17,7 +17,7 @@ Desarrollar una aplicación móvil utilizando Flutter para el control y gestión
 
 - **Análisis Visual:** Gráficos de barras interactivos para visualizar gastos por categoría con tooltips informativos.
 
-- **Exportación de Reportes:** Generación de reportes en formato PDF y Excel para análisis externo.
+- **Exportación de Reportes:** Generación de reportes en formato PDF y Excel con guardado directo en **Descargas** y apertura inmediata.
 
 - **Alertas Inteligentes:** Notificaciones automáticas al acercarse o exceder límites de presupuesto.
 
@@ -33,7 +33,7 @@ Desarrollar una aplicación móvil utilizando Flutter para el control y gestión
 
 ## Desarrollador:
 
-- [Luis Manuel De La Cruz Ledesma - Desarrollador](https://github.com/luismanuelcldev)|
+- [Luis Manuel De La Cruz Ledesma - Desarrollador](https://luismanueldelacruzldev.tech/)|
 
 ## Enlaces:
 
@@ -69,7 +69,8 @@ Desarrollar una aplicación móvil utilizando Flutter para el control y gestión
 - **Exportación PDF:** pdf ^3.11.3
 - **Exportación Excel:** excel ^4.0.6
 - **Compartir Archivos:** share_plus ^12.0.1
-- **Archivos:** path_provider ^2.1.4
+- **Archivos:** path_provider ^2.1.4, open_filex ^4.7.0
+- **Permisos:** permission_handler ^11.3.0
 
 ### Estructura del Proyecto
 ```
@@ -176,7 +177,7 @@ Esto iniciará la aplicación en el emulador, dispositivo conectado o navegador 
 
 ## Características Técnicas Implementadas
 
-### Gestión de Estado
+### Gestión de Gastos
 - **Patrón BLoC:** Implementación robusta con Cubit para manejo de estado reactivo
 - **Estado Inmutable:** Uso de copyWith para actualizaciones seguras de estado
 - **Separación de Responsabilidades:** Cubit separado de la UI para mejor mantenibilidad
@@ -197,7 +198,7 @@ Esto iniciará la aplicación en el emulador, dispositivo conectado o navegador 
 ### Exportación de Datos
 - **Reportes PDF:** Generación de reportes profesionales con tablas y totales
 - **Exportación Excel:** Archivos .xlsx compatibles con Excel y hojas de cálculo
-- **Gestión de Archivos:** Almacenamiento temporal con path_provider
+- **Gestión de Archivos:** Guardado directo en Descargas y apertura inmediata
 - **Manejo de Errores:** Validación y mensajes informativos al usuario
 
 ### Funcionalidades Avanzadas
@@ -238,13 +239,14 @@ class Presupuesto {
 }
 ```
 
-## Capturas de Funcionalidades
+### Capturas de Funcionalidades
 
 ### Gestión de Gastos
 - ✅ Registro de gastos con formulario validado
-- ✅ Lista visual con información completa
+- ✅ **Edición y actualización** de gastos existentes
+- ✅ Lista visual con información completa y hora exacta
 - ✅ Categorización automática por colores
-- ✅ Formato de fecha localizado (dd/MM/yyyy)
+- ✅ Formato de fecha y hora localizado (dd/MM/yyyy hh:mm a)
 
 ### Sistema de Categorías
 - ✅ Categorías predefinidas (Comida, Transporte, etc.)
@@ -268,7 +270,9 @@ class Presupuesto {
 - ✅ Reportes PDF con tabla profesional
 - ✅ Archivos Excel para análisis externo
 - ✅ Cálculo automático de totales
-- ✅ Gestión de archivos temporales
+- ✅ Guardado directo en carpeta de Descargas
+- ✅ Apertura inmediata de archivos generados
+- ✅ Manejo de Errores: Validación y mensajes informativos al usuario
 
 ---
 
