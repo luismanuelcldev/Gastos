@@ -5,9 +5,11 @@ import '../cubit/gastos_cubit.dart';
 import '../models/gasto.dart';
 import '../widgets/input_gasto.dart';
 
-// Vista para agregar un nuevo gasto
+// Vista para agregar o editar un gasto
 class AgregarGastoView extends StatefulWidget {
-  const AgregarGastoView({super.key});
+  final Gasto? gastoAEditar;
+
+  const AgregarGastoView({super.key, this.gastoAEditar});
 
   @override
   State<AgregarGastoView> createState() => _AgregarGastoViewState();
@@ -15,10 +17,24 @@ class AgregarGastoView extends StatefulWidget {
 
 class _AgregarGastoViewState extends State<AgregarGastoView> {
   final _formKey = GlobalKey<FormState>();
-  final _montoController = TextEditingController();
-  final _descripcionController = TextEditingController();
-  String _categoriaSeleccionada = 'Comida';
-  DateTime _fechaSeleccionada = DateTime.now();
+  late TextEditingController _montoController;
+  late TextEditingController _descripcionController;
+  late String _categoriaSeleccionada;
+  late DateTime _fechaSeleccionada;
+
+  @override
+  void initState() {
+    super.initState();
+    final gasto = widget.gastoAEditar;
+    _montoController = TextEditingController(
+      text: gasto?.monto.toString() ?? '',
+    );
+    _descripcionController = TextEditingController(
+      text: gasto?.descripcion ?? '',
+    );
+    _categoriaSeleccionada = gasto?.categoria ?? 'Comida';
+    _fechaSeleccionada = gasto?.fecha ?? DateTime.now();
+  }
 
   @override
   void dispose() {
@@ -225,14 +241,16 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                              child: const Row(
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.save, color: Colors.white),
-                                  SizedBox(width: 8),
+                                  const Icon(Icons.save, color: Colors.white),
+                                  const SizedBox(width: 8),
                                   Text(
-                                    'Guardar Gasto',
-                                    style: TextStyle(
+                                    widget.gastoAEditar != null
+                                        ? 'Actualizar Gasto'
+                                        : 'Guardar Gasto',
+                                    style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -272,20 +290,22 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
             ),
           ),
           const SizedBox(width: 16),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Nuevo Gasto',
-                style: TextStyle(
+                widget.gastoAEditar != null ? 'Editar Gasto' : 'Nuevo Gasto',
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
               Text(
-                'Registra tu gasto aquí',
-                style: TextStyle(fontSize: 16, color: Colors.white70),
+                widget.gastoAEditar != null
+                    ? 'Modifica los detalles del gasto'
+                    : 'Registra tu gasto aquí',
+                style: const TextStyle(fontSize: 16, color: Colors.white70),
               ),
             ],
           ),
@@ -386,23 +406,53 @@ class _AgregarGastoViewState extends State<AgregarGastoView> {
   // Guardo el gasto en el estado global
   void _guardarGasto() {
     if (_formKey.currentState!.validate()) {
+      final now = DateTime.now();
+      // Si estamos editando, mantenemos la hora original si la fecha no cambió.
+
+      DateTime fechaFinal;
+      if (widget.gastoAEditar != null &&
+          widget.gastoAEditar!.fecha.year == _fechaSeleccionada.year &&
+          widget.gastoAEditar!.fecha.month == _fechaSeleccionada.month &&
+          widget.gastoAEditar!.fecha.day == _fechaSeleccionada.day) {
+        // Si la fecha es la misma que la original, mantenemos la hora original
+        fechaFinal = widget.gastoAEditar!.fecha;
+      } else {
+        // Si es fecha nueva o gasto nuevo, usamos la hora actual
+        fechaFinal = DateTime(
+          _fechaSeleccionada.year,
+          _fechaSeleccionada.month,
+          _fechaSeleccionada.day,
+          now.hour,
+          now.minute,
+          now.second,
+        );
+      }
+
       final gasto = Gasto(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        id: widget.gastoAEditar?.id ?? now.millisecondsSinceEpoch.toString(),
         monto: double.parse(_montoController.text),
         categoria: _categoriaSeleccionada,
-        fecha: _fechaSeleccionada,
+        fecha: fechaFinal,
         descripcion: _descripcionController.text,
       );
 
-      context.read<GastosCubit>().agregarGasto(gasto);
+      if (widget.gastoAEditar != null) {
+        context.read<GastosCubit>().actualizarGasto(gasto);
+      } else {
+        context.read<GastosCubit>().agregarGasto(gasto);
+      }
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(
+          content: Row(
             children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 8),
-              Text('¡Gasto guardado exitosamente!'),
+              const Icon(Icons.check_circle, color: Colors.white),
+              const SizedBox(width: 8),
+              Text(
+                widget.gastoAEditar != null
+                    ? '¡Gasto actualizado exitosamente!'
+                    : '¡Gasto guardado exitosamente!',
+              ),
             ],
           ),
           backgroundColor: const Color(0xFFD32F2F),
